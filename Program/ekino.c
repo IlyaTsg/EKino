@@ -46,6 +46,7 @@ int main()
 {
     film *movies;
     movies = FileEnter();
+    movies = AppendKeyboard(movies);
     SaveToFile(movies);
     DemoOutput(movies);
     return 0;
@@ -173,10 +174,10 @@ void SaveToFile(film *list)
 
     if(p_file=fopen("films.csv", "w")){
         while(list){
-            fprintf(p_file, "%s;%s;%s;", list->title, list->director_name, list->genre);
+            fprintf(p_file, "\n%s;%s;%s;", list->title, list->director_name, list->genre);
             for(i=0; i<3; i++) fprintf(p_file, "%d;", list->release_date[i]);
             for(i=0; i<2; i++) fprintf(p_file, "%.2f;", list->rating[i]);
-            fprintf(p_file, "%d\n", list->kinopoisk_star);
+            fprintf(p_file, "%d", list->kinopoisk_star);
             list = list->next;
         }
     }else puts("File isn't open! Func: ListFromFile");
