@@ -46,6 +46,17 @@ film *DelEl(film*, film*);
 int EditFilm(film*, int, char*, char*);
 /* Edit film */
 
+film *ClearMem(film*);
+/* Clear memory of list */
+
+int OutputBy(film*, char*, char *(*FuncName)(film*));
+/* Output film by param */
+
+char *GetDirecName(film*);
+char *GetTitle(film*);
+char *GetGenre(film*);
+/* Return these values */
+
 void DemoOutput(film*);
 
 int EnterString(char*);
@@ -55,9 +66,14 @@ int main()
 {
     enum Bool {False, True};
     film *movies;
+    char *(*FindParam[3])(film*);
     char del_str[MaxStrLen], edit_str[MaxStrLen];
     int mode, mode_1, mode_2, mode_3, e_mode;
     int edit_flag;
+
+    FindParam[0] = GetDirecName;
+    FindParam[1] = GetTitle;
+    FindParam[2] = GetGenre;
 
     movies = FileEnter();
     do{
@@ -95,7 +111,7 @@ int main()
                             printf("Enter title of film: ");
                             EnterString(del_str);
                             movies = DelElByTit(movies, del_str);
-                            puts("Delete is OK");
+                            puts("Delete is OK!");
                         }else puts("Catalog is empty!");
                         getchar();
                         break;
@@ -124,7 +140,7 @@ int main()
                                     printf("Enter new parameter(that you've chosen) of film: ");
                                     EnterString(edit_str);
                                     if(!EditFilm(movies, e_mode, edit_str, del_str)) puts("This film was not founded!");
-                                    else puts("Edit is OK");
+                                    else puts("Edit is OK!");
                                     getchar();
                                 }
                             }while(e_mode);
@@ -132,9 +148,16 @@ int main()
                         getchar();
                         break;
                     case 4:
+                        if(movies){
+                            movies = ClearMem(movies);
+                            puts("Clearing is OK!");
+                        }else puts("Catalog is empty!");
+                        getchar();
                         break;
                     case 5:
                         SaveToFile(movies);
+                        puts("Save is OK!");
+                        getchar();
                     case 0:
                         break;
                     default:
@@ -144,6 +167,31 @@ int main()
                 }while(mode_1);
                 break;
             case 2:
+                if(movies){
+                    do{
+                        CLS;
+                        puts("-----Menu-----");
+                        puts("1 - By director name");
+                        puts("2 - By title");
+                        puts("3 - By genre");
+                        puts("0 - Exit");
+                        do{
+                            printf("Enter your choice: ");
+                            scanf("%d", &mode_2);
+                            getchar();
+                        }while(mode_2<0 || mode_2>3);
+                        if(mode_2){
+                            printf("Enter parameter: ");
+                            EnterString(edit_str);
+                            if(OutputBy(movies, edit_str, FindParam[mode_2-1])) puts("No films with this parameter!");
+                            getchar();
+                        }
+                    }while(mode_2);
+                }
+                else{ 
+                    puts("Catalog is empty!");
+                    getchar();
+                }
                 break;
             case 3:
                 break;
@@ -218,18 +266,21 @@ film *FileEnter()
 
 film *AppendKeyboard(film *list)
 {
+    film *tmp_el;
     char *tmp_str;
     char sep = '.';
     int slen, i;
 
+    tmp_el = list;
+
     if(tmp_str=malloc(MaxStrLen)){
-        if(list){
-            while(list->next) list = list->next;
-            list->next = MakeList();
-            InsertAfter(list, list->next);
+        while(list){
+            tmp_el = list;
             list = list->next;
         }
-
+        list = MakeList();
+        InsertAfter(tmp_el, list);
+        
         if(list){
             printf("Enter title of movie: ");
             slen = EnterString(tmp_str);
@@ -310,7 +361,7 @@ film *MakeList()
 
 void InsertAfter(film *cur_el, film *new_el)
 {
-    if(new_el){
+    if(new_el&&cur_el){
         if(!cur_el->next || cur_el->next==new_el){
             cur_el->next = new_el;
             new_el->next = NULL;
@@ -405,6 +456,42 @@ int EditFilm(film *list, int mode, char *par, char *name)
     return is_film;
 }
 
+film *ClearMem(film *list)
+{
+    if(list){
+        ClearMem(list->next);
+        free(list->director_name);
+        free(list->genre);
+        free(list->title);
+        list->director_name = NULL;
+        list->genre = NULL;
+        list->title = NULL;
+        free(list);
+        list = NULL;
+    }
+
+    return list;
+}
+
+int OutputBy(film *movies, char *user_par, char *(*FuncName)(film*)){
+    int flag; // is here film with whis param
+    flag = 1;
+    while(movies){
+        if(!strcmp(FuncName(movies), user_par)){
+            printf("Title: %s\n", movies->title);
+            printf("Director name: %s\n", movies->director_name);
+            printf("Genre: %s\n\n", movies->genre);
+            flag = 0;
+        }
+        movies = movies->next;
+    }
+    return flag;
+}
+
+char *GetDirecName(film *elem){ return elem->director_name; }
+char *GetTitle(film *elem){ return elem->title; }
+char *GetGenre(film *elem){ return elem->genre; }
+
 void DemoOutput(film *list)
 {
     while(list){
@@ -412,7 +499,7 @@ void DemoOutput(film *list)
         printf("Genre: %s\n", list->genre);
         printf("Adress of prev: %p\n", list->prev);
         printf("Adress of this: %p\n", list);
-        printf("Adress of next: %p\n", list->next);
+        printf("Adress of next: %p\n\n", list->next);
         list = list->next;
     }
 }
