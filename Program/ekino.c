@@ -57,6 +57,18 @@ char *GetTitle(film*);
 char *GetGenre(film*);
 /* Return these values */
 
+film *SortBy(film *, int (*GetParam)(film*));
+/* Sort catalog by some digit param*/
+
+int GetYear(film *elem);
+int GetMounth(film *elem);
+int GetDay(film *elem);
+int GetRating(film *elem);
+/* Return these values */
+
+film *Swap(film*, film*);
+/* Swap two elements of list */
+
 void DemoOutput(film*);
 
 int EnterString(char*);
@@ -194,6 +206,41 @@ int main()
                 }
                 break;
             case 3:
+                if(movies){
+                    do{
+                        CLS;
+                        puts("-----Menu-----");
+                        puts("1 - By date of release");
+                        puts("2 - By Imdb rating");
+                        puts("0 - Exit");
+                        printf("Enter your choice: ");
+                        scanf("%d", &mode_3);
+                        getchar();
+                        switch(mode_3){
+                            case 1:
+                                movies = SortBy(movies, GetDay);
+                                movies = SortBy(movies, GetMounth);
+                                movies = SortBy(movies, GetYear);
+                                puts("Sort is OK!");
+                                getchar();
+                                break;
+                            case 2:
+                                movies = SortBy(movies, GetRating);
+                                puts("Sort is OK!");
+                                getchar();
+                                break;
+                            case 0:
+                                break;
+                            default: 
+                                puts("Enter correct mode!");
+                                getchar();
+                        }
+                    }while(mode_3);
+                }
+                else{ 
+                    puts("Catalog is empty!");
+                    getchar();
+                }
                 break;
             case 4:
                 DemoOutput(movies);
@@ -492,14 +539,76 @@ char *GetDirecName(film *elem){ return elem->director_name; }
 char *GetTitle(film *elem){ return elem->title; }
 char *GetGenre(film *elem){ return elem->genre; }
 
+film *SortBy(film *movies, int (*GetParam)(film*))
+{
+    if(movies){
+        film *tmp_el1, *tmp_el2;
+        int i, j;
+        while(movies->next){
+            tmp_el1 = movies->next;
+            while(tmp_el1){
+                if(GetParam(movies) > GetParam(tmp_el1)){ 
+                    Swap(movies, tmp_el1);
+                    tmp_el2 = tmp_el1;
+                    tmp_el1 = movies;
+                    movies = tmp_el2;
+                }
+                tmp_el1 = tmp_el1->next;
+            }
+            movies = movies->next;
+        }
+        while(movies->prev) movies = movies->prev;
+    }
+    return movies;
+}
+
+int GetYear(film *elem){ return elem->release_date[2]; }
+int GetMounth(film *elem){ return elem->release_date[1]; }
+int GetDay(film *elem){ return elem->release_date[0]; }
+int GetRating(film *elem){ return elem->rating[0]; }
+
+film *Swap(film *el_1, film *el_2)
+{
+    film *tmp_el;
+    if(el_1 && el_2){
+        if(el_1->next == el_2){
+            el_1->next = el_2->next;
+            el_2->prev = el_1->prev;
+            el_1->prev = el_2;
+            el_2->next = el_1;
+        }
+        else{
+            tmp_el = el_1->next;
+            el_1->next = el_2->next;
+            el_2->next = tmp_el;
+            tmp_el = el_1->prev;
+            el_1->prev = el_2->prev;
+            el_2->prev = tmp_el;
+            if(el_1->prev) el_1->prev->next = el_1;
+            if(el_2->next) el_2->next->prev = el_2;
+        }
+        if(el_1->next) el_1->next->prev = el_1;
+        if(el_2->prev) el_2->prev->next = el_2;
+        while(el_1->prev) el_1 = el_1->prev;
+    }
+    return el_1;
+}
+
 void DemoOutput(film *list)
 {
     while(list){
+        puts("----------------");
         printf("Title: %s\n", list->title);
+        printf("Director: %s\n", list->director_name);
         printf("Genre: %s\n", list->genre);
+        printf("Date of release: %d.%d.%d\n", list->release_date[0], list->release_date[1], list->release_date[2]);
+        printf("IMDb rating: %.2f\n", list->rating[0]);
+        printf("Kinopoisk rating: %.2f\n", list->rating[1]);
+        printf("Kinopoisk stars: %d\n", list->kinopoisk_star);
         printf("Adress of prev: %p\n", list->prev);
         printf("Adress of this: %p\n", list);
         printf("Adress of next: %p\n\n", list->next);
+        printf("----------------\n\n");
         list = list->next;
     }
 }
