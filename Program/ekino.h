@@ -166,9 +166,7 @@ film *AppendKeyboard(film *list)
             }else puts("Memory allocation! Func: ListFromKeyboard");
         }else puts("Memory allocation! Func: ListFromKeyboard");
     }else puts("Memory allocation! Func: ListFromKeyboard");
-
     while(list->prev) list = list->prev;
-
     return list;
 }
 
@@ -284,22 +282,28 @@ film *ClearMem(film *list)
         free(list);
         list = NULL;
     }
-
     return list;
 }
 
 int OutputBy(film *movies, char *user_par, char *(*FuncName)(film*)){
     int flag; // is here film with whis param
     flag = 1;
+    printf("\n|Title|Director name|Genre|Date of release|Imdb r|Kinopoisk r|Kinopoisk star|\n");
     while(movies){
         if(!strcmp(FuncName(movies), user_par)){
-            printf("Title: %s\n", movies->title);
-            printf("Director name: %s\n", movies->director_name);
-            printf("Genre: %s\n\n", movies->genre);
+            puts("----------------------------------------------------------------------------");
+            printf("|%s", movies->title);
+            printf("|%s", movies->director_name);
+            printf("|%s", movies->genre);
+            printf("|%d.%d.%d", movies->release_date[0], movies->release_date[1], movies->release_date[2]);
+            printf("|%.2f", movies->rating[0]);
+            printf("|%.2f", movies->rating[1]);
+            printf("|%d|\n", movies->kinopoisk_star);
             flag = 0;
         }
         movies = movies->next;
     }
+    puts("----------------------------------------------------------------------------");
     return flag;
 }
 
@@ -362,23 +366,19 @@ int GetMounth(film *elem){ return elem->release_date[1]; }
 int GetDay(film *elem){ return elem->release_date[0]; }
 int GetRating(film *elem){ return elem->rating[0]; }
 
-
-
-void DemoOutput(film *list)
+void OutputList(film *list)
 {
+    printf("\n|Title|Director name|Genre|Date of release|Imdb r|Kinopoisk r|Kinopoisk star|\n");
     while(list){
-        puts("----------------");
-        printf("Title: %s\n", list->title);
-        printf("Director: %s\n", list->director_name);
-        printf("Genre: %s\n", list->genre);
-        printf("Date of release: %d.%d.%d\n", list->release_date[0], list->release_date[1], list->release_date[2]);
-        printf("IMDb rating: %.2f\n", list->rating[0]);
-        printf("Kinopoisk rating: %.2f\n", list->rating[1]);
-        printf("Kinopoisk stars: %d\n", list->kinopoisk_star);
-        printf("Adress of prev: %p\n", list->prev);
-        printf("Adress of this: %p\n", list);
-        printf("Adress of next: %p\n\n", list->next);
-        printf("----------------\n\n");
+        puts("----------------------------------------------------------------------------");
+        printf("|%s", list->title);
+        printf("|%s", list->director_name);
+        printf("|%s", list->genre);
+        printf("|%d.%d.%d", list->release_date[0], list->release_date[1], list->release_date[2]);
+        printf("|%.2f", list->rating[0]);
+        printf("|%.2f", list->rating[1]);
+        printf("|%d|\n", list->kinopoisk_star);
         list = list->next;
     }
+    puts("----------------------------------------------------------------------------");
 }

@@ -4,7 +4,7 @@
 #include "ekino.h"
 
 #define OS linux
-#ifdef OS 
+#ifdef OS
 #define CLS system("clear")
 #else
 #define CLS system("cls")
@@ -179,7 +179,8 @@ int main()
                 }
                 break;
             case 4:
-                DemoOutput(movies);
+                if(movies) OutputList(movies);
+                else puts("Catalog is empty!");
                 getchar();
                 break;
             case 0:
