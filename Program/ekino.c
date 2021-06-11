@@ -12,12 +12,10 @@
 
 int main()
 {
-    enum Bool {False, True};
     film *movies;
     char *(*FindParam[3])(film*);
     char del_str[MaxStrLen], edit_str[MaxStrLen];
     int mode, mode_1, mode_2, mode_3, e_mode;
-    int edit_flag;
 
     FindParam[0] = GetDirecName;
     FindParam[1] = GetTitle;
@@ -65,7 +63,6 @@ int main()
                         break;
                     case 3:
                         if(movies){
-                            edit_flag = False;
                             do{
                                 CLS;
                                 puts("-----Menu-----");
@@ -147,7 +144,7 @@ int main()
                         CLS;
                         puts("-----Menu-----");
                         puts("1 - By date of release");
-                        puts("2 - By Imdb rating");
+                        puts("2 - By kinopisk star");
                         puts("0 - Exit");
                         printf("Enter your choice: ");
                         scanf("%d", &mode_3);

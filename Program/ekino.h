@@ -364,7 +364,7 @@ film *SortBy(film *movies, int (*GetParam)(film*))
 int GetYear(film *elem){ return elem->release_date[2]; }
 int GetMounth(film *elem){ return elem->release_date[1]; }
 int GetDay(film *elem){ return elem->release_date[0]; }
-int GetRating(film *elem){ return elem->rating[0]; }
+int GetRating(film *elem){ return elem->kinopoisk_star; }
 
 void OutputList(film *list)
 {
